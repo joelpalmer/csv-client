@@ -16,13 +16,8 @@ fn run() -> Result<(), Box<Error>> {
 
     // Loop over each record
     for result in rdr.records() {
-        // examine results
-        // if no problem, print record
-        // else, print error message & quit
-        match result {
-            Err(err) => return Err(From::from(err)),
-            Ok(record) => println!("{:?}", record),
-        }
+        let record = result?;
+        println!("{:?}", record);
     }
 
     Ok(())
