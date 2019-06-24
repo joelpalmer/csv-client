@@ -1,24 +1,34 @@
 extern crate csv;
+use std::env;
 use std::error::Error;
-use std::io;
+use std::ffi::OsString;
+use std::fs::File;
 use std::process;
 
-fn main() {
-    if let Err(err) = run() {
-        println!("{}", err);
-        process::exit(1);
-    }
-}
-
 fn run() -> Result<(), Box<Error>> {
-    // Create a CSV parser that reads data from stdin
-    let mut rdr = csv::Reader::from_reader(io::stdin());
-
-    // Loop over each record
+    let file_path = get_first_arg()?;
+    let file = File::open(file_path)?;
+    let mut rdr = csv::Reader::from_reader(file);
     for result in rdr.records() {
         let record = result?;
         println!("{:?}", record);
     }
 
     Ok(())
+}
+
+/// Returns 1st positional arg sent to process.
+/// If there are no positional args, return an error.
+fn get_first_arg() -> Result<OsString, Box<Error>> {
+    match env::args_os().nth(1) {
+        None => Err(From::from("expected 1 arg, got none")),
+        Some(file_path) => Ok(file_path),
+    }
+}
+
+fn main() {
+    if let Err(err) = run() {
+        println!("{}", err);
+        process::exit(1);
+    }
 }
