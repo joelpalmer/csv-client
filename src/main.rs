@@ -1,5 +1,6 @@
 extern crate csv;
 use std::io;
+use std::process;
 
 fn main() {
     // Create a CSV parser that reads data from stdin
@@ -7,10 +8,15 @@ fn main() {
 
     // Loop over each record
     for result in rdr.records() {
-        // todo: handle possible errors
-        let record = result.expect("a CSV record");
-
-        // Print debug version of the record
-        println!("{:?}", record);
+        // examine results
+        // if no problem, print record
+        // else, print error message & quit
+        match result {
+            Ok(record) => println!("{:?}", record),
+            Err(err) => {
+                println!("error reading CSV from <stdin>: {}", err);
+                process::exit(1);
+            }
+        }
     }
 }
